@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <title>Generate kunci RSA</title>
+        <link rel="stylesheet" href="Program-CSS.css" />
+    </head>
+    <body>
+<!-- Link Navigasi Halaman Aplikasi DRM -->        
+        <nav>
+            <a href="Halaman Akses File.html"><b>AKSES KONTEN</b></a>
+            <a class="selected" href="Halaman Generate Kunci.html"><b>GENERATE KUNCI</b></a>
+            <a href="Halaman Enkripsi.html"><b>AUTENTIKASI</b></a>
+            <a href="Halaman Dekripsi.html"><b>AUTORISASI</b></a>
+        </nav>
+<!-- Isi Halaman Aplikasi DRM: - Teks - Form Input Key - Tombol -->
+        <div class="page">
+            <h1>STUDIO TV UAD - DIGITAL RIGHTS MANAGEMENT</h1>
+            <p class="header-description">
+                Buat Kunci Publik dan Privat Untuk Enkripsi dan Dekripsi File Video
+            </p>
+            <button id="tombol">Generate Kunci</button>
+            <div id="pesan"></div>
+<!-- Form Hasi Generete Kunci Publik dan Privat -->              
+            <div id="hasil">
+                <div class="field">
+                    <label for="kunci-publik">KUNCI PUBLIK RSA:</label>
+                    <a id="download-kunci-publik" class="download" download="id_kunci_publik">Simpan Kunci Publik</a>
+                    <textarea id="teks-kunci-publik" rows="10" readonly></textarea>
+                </div>
+                <div class="field">
+                    <label for="kunci-privat">KUNCI PRIVAT RSA:</label>
+                    <a id="download-kunci-privat" class="download" download="id_kunci_privat">Simpan Kunci Privat</a>
+                    <textarea id="teks-kunci-privat" rows="10" readonly></textarea>
+                </div>
+            </div>
+        </div>
+        <footer>
+            <p style="text-align:center;">STUDIO TV UAD </p>
+        </footer>
+    </body>
+
+ <!-- Program Ini Akan Memproses Generate Kunci Dengan Mengambil Sumber Daya/Linked ke Program External: -->   
+
+    <script src="Program-Encoding-Kunci-RSA.js"></script>
+    <script src="AES-RSA.js"></script>
+    <script>
+        (function () {
+            var TeksKunciPublik = document.getElementById("teks-kunci-publik");
+            var DownloadKunciPublik = document.getElementById("download-kunci-publik");
+            var TeksKunciPrivat = document.getElementById("teks-kunci-privat");
+            var DownloadKunciPrivat = document.getElementById("download-kunci-privat");
+            var tombol = document.getElementById("tombol");
+            var pesan = document.getElementById("pesan");
+            var hasil = document.getElementById("hasil");
+
+            var berhasil = function (kunci) {
+                TeksKunciPublik.value = arrayBufferToPem(kunci.publicKeyBuffer, "[KUNCI PUBLIK RSA]");
+                DownloadKunciPublik.href = window.URL.createObjectURL(
+                    new Blob([TeksKunciPublik.value], { type: "application/octet-stream" }));
+                TeksKunciPrivat.value = arrayBufferToPem(kunci.privateKeyBuffer, "[KUNCI PRIVAT RSA]");
+                DownloadKunciPrivat.href = window.URL.createObjectURL(
+                    new Blob([TeksKunciPrivat.value], { type: "application/octet-stream" }));
+                hasil.style.display = "block";
+                pesan.innerText = null;
+                tombol.disabled = false;
+            };
+
+            var kesalahan = function (kesalahan) {
+                pesan.innerText = kesalahan;
+                tombol.disabled = false;
+            };
+
+            var proses = function () {
+                pesan.innerText = "Memproses Kunci...";
+                tombol.disabled = true;
+                BuatkunciRSA().then(berhasil, kesalahan);
+            };
+
+            var peringatan = function () {
+                if (privateKey.value === "") return;
+                return "Apa Anda yakin? Kunci Anda akan hilang kecuali Anda telah menyimpannya.";
+            };
+
+            tombol.addEventListener("click", proses);
+            window.onbeforeunload = warn;
+        })();
+    </script>
+</html>

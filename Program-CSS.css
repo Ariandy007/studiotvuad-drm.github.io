@@ -1,0 +1,78 @@
+* {
+    font-family: Consolas, monospace;
+}
+
+body {
+    color: #000000;
+    background-color: #ffffff;
+    font-size: 18px;
+    margin: 30px 30px 0;
+}
+
+.field, #tombol {
+    margin-bottom: 30px;
+}
+
+.field > label {
+    display: inline-block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.field > .download {
+    float: right;
+}
+
+input, textarea {
+    background-color: #000000;
+    width: 100%;
+    color: #15ff00;
+}
+
+button, input[type=file] {
+    padding: 10px;
+    font-size: 20px;
+    background-color: #000000;
+    color: #3399ff;
+}
+
+.header-description {
+    margin-bottom: 30px;
+}
+
+#pesan {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+nav {
+    background-color: #808080;
+}
+
+nav > a {
+    display: inline-block;
+    padding: 15px;
+    text-decoration: none;
+}
+
+nav > a.selected {
+    background-color: #e6e6e6;
+}
+
+.page {
+    padding: 30px;
+    background-color: #e6e6e6;
+}
+
+a {
+    color: #000000;
+}
+
+footer {
+    margin: 15px;
+    background-color: #cccccc;
+}
+
+#hasil {
+    display: none;
+}

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <title>Otorisasi File Video</title>
+        <link rel="stylesheet" href="Program-CSS.css" />
+    </head>
+    <body>
+<!-- Link Navigasi Halaman -->        
+        <nav>
+            <a href="Halaman Akses File.html"><b>AKSES KONTEN</b></a>
+            <a href="Halaman Generate Kunci.html"><b>GENERATE KUNCI</b></a>
+            <a href="Halaman Enkripsi.html"><b>AUTENTIKASI</b></a>
+            <a class="selected" href="Halaman Dekripsi.html"><b>AUTORISASI</b></a>
+        </nav>
+<!-- Isi  Halaman Web Aplikasi DRM: -->
+        <div class="page">
+            <h1>STUDIO TV UAD - DIGITAL RIGHTS MANAGEMENT</h1>
+            <p class="header-description">
+                Masukkan Kunci Privat RSA Untuk Dekripsi File Video
+            </p>
+<!-- Form Input Teks Kunci Privat RSA: -->
+            <div class="field">
+                <label for="kunci-privat">KUNCI PRIVAT RSA:</label>
+                <textarea id="kunci-privat" rows="10"></textarea>
+            </div>
+<!-- Input File Video Terenkripsi: -->
+            <div class="field">
+                <label for="pilih-file-video">Pilih File Video Yang Ingin di Dekripsi:</label>
+                <input id="pilih-file-video" type="file"></input>
+            </div>
+<!-- Hasil Dekripsi: -->
+            <button id="tombol">DEKRIPSI FILE</button> >>
+            <div id="pesan"></div>
+            <div id="hasil" class="field" style="display: none;">
+                <label for="file-video-terdekripsi">Hasil [Klik Untuk Unduh File Video]:</label>
+                <div><a id="file-video-terdekripsi"></a></div>
+            </div>
+        </div>
+
+        <footer>
+            <p style="text-align:center;">STUDIO TV UAD </p>
+        </footer>
+    </body>
+
+<!-- Program Ini Akan Memproses Dekripsi File Video Dengan Mengambil Sumber Daya/Linked ke Program External -->    
+    <script src="Program-Encoding-Kunci-RSA.js"></script>
+    <script src="AES-RSA.js"></script>
+    <script>
+        (function () {
+            var KunciPrivat = document.getElementById("kunci-privat");
+            var encryptedFile = document.getElementById("pilih-file-video");
+            var tombol = document.getElementById("tombol");
+            var pesan = document.getElementById("pesan");
+            var FileVideoMp4Asli = document.getElementById("file-video-terdekripsi");
+            var hasil = document.getElementById("hasil");
+
+            var berhasil = function (video) {
+                var encryptedFile2 = encryptedFile.files[0];
+
+                FileVideoMp4Asli.href = window.URL.createObjectURL(
+                    new Blob([video], { type: "video/mp4" }));
+                FileVideoMp4Asli.download = FileVideoMp4Asli.innerText
+                    = encryptedFile2.name.replace(".DRM", "");
+                hasil.style.display = "block";
+
+                pesan.innerText = null;
+                tombol.disabled = false;
+            };
+
+            var kesalahan = function (kesalahan) {
+                pesan.innerText = kesalahan;
+                tombol.disabled = false;
+            };
+
+            var proses = function () {
+                pesan.innerText = "Memproses Dekripsi...";
+                tombol.disabled = true;
+
+                if (KunciPrivat.value.trim() === "")
+                    return kesalahan("Masukkan Kunci Pribadi RSA yang Spesifik.");
+
+                var KunciPrivatArrayBuffer = null;
+                try { KunciPrivatArrayBuffer = pemToArrayBuffer(KunciPrivat.value.trim()); }
+                catch (_) { return kesalahan("Kunci Privat Tidak Valid."); }
+
+                if (!encryptedFile.files.length)
+                    return kesalahan("Anda Harus Memilih File Video Untuk Didekripsi.");
+
+                var fileReader = new FileReader();
+                fileReader.onload = function () {
+                    dekripsiRSA(this.result, KunciPrivatArrayBuffer).then(berhasil, kesalahan);
+                };
+                fileReader.readAsArrayBuffer(encryptedFile.files[0]);
+            };
+
+            tombol.addEventListener("click", proses);
+        })();
+    </script>
+</html>

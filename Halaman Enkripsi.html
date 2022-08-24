@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="utf-8" />
+        <title>Autentikasi File Video</title>
+        <link rel="stylesheet" href="Program-CSS.css" />
+    </head>
+    <body>
+<!-- Link Navigasi Halaman Web Aplikasi DRM-->        
+        <nav>
+            <a href="Halaman Akses File.html"><b>AKSES KONTEN</b></a>
+            <a href="Halaman Generate Kunci.html"><b>GENERATE KUNCI</b></a>
+            <a class="selected" href="Halaman Enkripsi.html"><b>AUTENTIKASI</b></a>
+            <a href="Halaman Dekripsi.html"><b>AUTORISASI</b></a>
+        </nav>
+<!-- Isi  Halaman Web Aplikasi DRM: -->
+        <div class="page">
+            <h1>STUDIO TV UAD - DIGITAL RIGHTS MANAGEMENT</h1>
+            <p class="header-description">
+                Masukkan Kunci Publik RSA Untuk Enkripsi File Video
+            </p>
+<!-- Form Input Teks Kunci Publik RSA: -->
+            <div class="field">
+                <label for="kunci-publik">KUNCI PUBLIK RSA:</label>
+                <textarea id="kunci-publik" rows=10></textarea>
+            </div>
+<!-- Input File Video: -->
+            <div class="field">
+                <label for="pilih-file-video">Pilih File Video Yang Ingin di Enkripsi:</label>
+                <input id="pilih-file-video" type="file"></input>
+            </div>
+<!-- Hasil Enkripsi: -->
+            <button id="tombol">ENKRIPSI FILE</button> >>
+            <div id="pesan"></div>
+            <div id="hasil" class="field">
+                <label for="file-video-terenkripsi">Hasil [Klik Untuk Unduh File]:</label>
+                <div><a id="file-video-terenkripsi"></a></div>
+            </div>
+        </div>
+        <footer>
+            <p style="text-align:center;">STUDIO TV UAD </p>
+        </footer>
+    </body>
+
+<!-- Program Ini Akan Memproses Enkripsi File Video Dengan Mengambil Sumber Daya/Linked ke Program External: -->    
+    <script src="Program-Encoding-Kunci-RSA.js"></script>
+    <script src="AES-RSA.js"></script>
+    <script>
+        (function () {
+            var KunciPublik = document.getElementById("kunci-publik");
+            var PilihFileVideo = document.getElementById("pilih-file-video");
+            var tombol = document.getElementById("tombol");
+            var pesan = document.getElementById("pesan");
+            var FileVideoTerenkripsi = document.getElementById("file-video-terenkripsi");
+            var hasil = document.getElementById("hasil");
+
+            var berhasil = function (video) {
+                var unFileVideoTerenkripsi = PilihFileVideo.files[0];
+
+                FileVideoTerenkripsi.href = window.URL.createObjectURL(
+                    new Blob([video], { type: "video/mp4" }));
+                FileVideoTerenkripsi.download = FileVideoTerenkripsi.innerText
+                    = unFileVideoTerenkripsi.name + "";
+                hasil.style.display = "block";
+
+                pesan.innerText = null;
+                tombol.disabled = false;
+            };
+
+            var kesalahan = function (kesalahan) {
+                pesan.innerText = kesalahan;
+                tombol.disabled = false;
+            };
+
+            var proses = function () {
+                pesan.innerText = "Memproses...";
+                tombol.disabled = true;
+
+                if (KunciPublik.value.trim() === "")
+                    return kesalahan("Masukkan Kunci Publik RSA yang Spesifik.");
+
+                var KunciPublikArrayBuffer = null;
+                try { KunciPublikArrayBuffer = pemToArrayBuffer(KunciPublik.value.trim()); }
+                catch (_) { return kesalahan("Kunci Publik Tidak Valid."); }
+
+                if (!PilihFileVideo.files.length)
+                    return kesalahan("Anda harus memilih file untuk dienkripsi.");
+
+                var fileReader = new FileReader();
+                fileReader.onload = function () {
+                    enkripsiRSA(this.result, KunciPublikArrayBuffer).then(berhasil, kesalahan);
+                };
+                fileReader.readAsArrayBuffer(PilihFileVideo.files[0]);
+            }; 
+
+            tombol.addEventListener("click", proses);
+        })();
+    </script>
+</html>
